@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "southeastasia"
+        },
+        "virtualMachineName": {
+            "value": "VM3"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_DS1_v2"
+        },
+        "adminUsername": {
+            "value": "student"
+        },
+        "virtualNetworkName": {
+            "value": "SEA-VNET2"
+        },
+        "networkInterfaceName": {
+            "value": "vm3637"
+        },
+        "networkSecurityGroupName": {
+            "value": "VM-NSG"
+        },
+        "adminPassword": {
+            "value": ""
+        },
+        "diagnosticsStorageAccountName": {
+            "value": "vmrgdiag487"
+        },
+        "diagnosticsStorageAccountId": {
+            "value": "/subscriptions/664e6481-332d-435c-af74-7ff0c18e38b8/resourceGroups/VMRG/providers/Microsoft.Storage/storageAccounts/vmrgdiag487"
+        },
+        "subnetName": {
+            "value": "SUBNET1"
+        },
+        "publicIpAddressName": {
+            "value": "VM3-IP"
+        },
+        "publicIpAddressType": {
+            "value": "Dynamic"
+        },
+        "publicIpAddressSku": {
+            "value": "Basic"
+        },
+        "autoShutdownStatus": {
+            "value": "Enabled"
+        },
+        "autoShutdownTime": {
+            "value": "19:00"
+        },
+        "autoShutdownTimeZone": {
+            "value": "UTC"
+        },
+        "autoShutdownNotificationStatus": {
+            "value": "Disabled"
+        }
+    }
+}
