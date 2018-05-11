@@ -367,11 +367,13 @@ try {
 	$lbrule = New-AzureRmLoadBalancerRuleConfig -Name $LBRuleName -FrontendIpConfiguration $frontendIP -BackendAddressPool $backendPool -Protocol Tcp -FrontendPort 80 -BackendPort 80 -Probe $probe
 	
 	# CREATE the load balancer with the defined configuration above:
+	Write-Verbose -Message "Creating object $LBName of object type: LoadBalancer"
 	$lb = New-AzureRmLoadBalancer `
 	-ResourceGroupName $RGVNETName -Name $LBName -Location $Location -FrontendIpConfiguration $frontendIP `
 	-BackendAddressPool $backendPool -Probe $probe -LoadBalancingRule $lbrule -ErrorAction Stop
 
 	# Now set the LoadBalancerBackendAddressPools property on the network interface objects for VM1 and VM2 to contain the backend pool data.
+	Write-Verbose -Message "Adding Network Interfaces for VM1 and VM2 to BackendAddressPool of NLB."
 	$NetworkInterfaces = Get-AzureRmNetworkInterface -ResourceGroupName VMRG -ErrorAction Stop
 	$nic1 = $NetworkInterfaces | Where-Object { $_.VirtualMachine.Id -like "*/VM1" }
 	$nic2 = $NetworkInterfaces | Where-Object { $_.VirtualMachine.Id -like "*/VM2" }
