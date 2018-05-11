@@ -17,7 +17,7 @@ The script is large, primarily due to commenting, error handling each cmdlet cal
 7. Peering VNET1 and VNET2.
 8. Adding a route table and configuration to route traffic from VNET2 to VM1 in VNET1.
 9. Opening up port 80 on the VM Network Security Group.
-10. Creating a load balancer (upto to the point at which you must add an availablity set to it - sure how to do this at present)
+10. Creating a load balancer and adding the network interfaces of VM1 and VM2 to the backend pool configuration.
 
 ## Requirements
  - PowerShell 5+.
