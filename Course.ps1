@@ -27,8 +27,6 @@
 	.PARAMETER LBBackEndPoolName
 	.PARAMETER LBProbeName
 	.PARAMETER LBRuleName
-	.OUTPUTS
-		None
 #>
     
 [CmdletBinding()]
@@ -63,10 +61,12 @@ $VerbosePreference = 'Continue'
 ##################################################################################
 # Prompt to login, if not already authenticated:
 Write-Verbose -Message "Logging in..."
-try { 
+try 
+{ 
 	Login-AzureRmAccount
 }
-catch {
+catch 
+{
 	throw $_
 }
 
@@ -76,13 +76,17 @@ catch {
 if((Get-AzureRmResourceGroup -Name $RGVNETName -ErrorAction SilentlyContinue) -eq $null)
 {
 	Write-Verbose -Message "Creating object: $RGVNETName of type ResourceGroup"
-	try {
+	try 
+	{
 		New-AzureRmResourceGroup -Name $RGVNETName -Location $Location -ErrorAction Stop
 	}
-	catch {
+	catch 
+	{
 		throw $_
 	}
-} else {
+}
+else
+{
 	Write-Verbose -Message "ResourceGroup $RGVNETName already exists."
 }
 
@@ -94,21 +98,27 @@ if((Get-AzureRmVirtualNetwork -Name $VNET1Name -ResourceGroupName $RGVNETName -E
 	Write-Verbose -Message "Creating object: $VNET1Name of type VirtualNetwork with two subnets."
 	$SN1 = New-AzureRmVirtualNetworkSubnetConfig -Name 'SUBNET1' -AddressPrefix $VNET1Subnet1AddressRange
 	$SN2 = New-AzureRmVirtualNetworkSubnetConfig -Name 'SUBNET2' -AddressPrefix $VNET1Subnet2AddressRange
-    try {
+	
+	try {
         New-AzureRmVirtualNetwork -Name $VNET1Name -ResourceGroupName $RGVNETName -AddressPrefix $VNET1AddressSpace -Subnet $SN1,$SN2 -Location $Location -ErrorAction Stop
     }
     catch {
-        throw $_       
-	}
-	
-	# Get the virtual network object for use in other code:
-	try {
-		$vnet1 = Get-AzureRmVirtualNetwork -Name $VNET1Name -ResourceGroupName $RGVNETName -ErrorAction Stop
-	}
-	catch {
 		throw $_
 	}
-} else {
+
+	# Get the virtual network object for use in other code:
+	try
+	{
+		$vnet1 = Get-AzureRmVirtualNetwork -Name $VNET1Name -ResourceGroupName $RGVNETName -ErrorAction Stop
+	}
+	catch
+	{
+		throw $_
+	}
+
+}
+else
+{
     Write-Verbose -Message "VirtualNetwork $VNET1Name already exists."
 }
 
@@ -119,22 +129,27 @@ if($vnet1.Subnets.Name -notcontains 'GatewaySubnet')
 {
     Write-Verbose -Message "Adding GatewaySubnet to $VNET1Name"
     Add-AzureRmVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -VirtualNetwork $vnet1 -AddressPrefix '192.168.3.0/29'
-    try {
+	try 
+	{
         Set-AzureRmVirtualNetwork -VirtualNetwork $vnet1 -ErrorAction Stop
     }
-    catch {
-        throw $_
+	catch
+	{
+		throw $_
 	}
 	
 	# Re-get the virtual network object so it contains the Gateway subnet configuration in the subnets property - we use this later:
-	try {
+	try
+	{
 		$vnet1 = Get-AzureRmVirtualNetwork -Name $VNET1Name -ResourceGroupName $RGVNETName -ErrorAction Stop
 	}
-	catch {
+	catch
+	{
 		throw $_
 	}
 }
-else {
+else 
+{
     Write-Verbose -Message 'GatewaySubnet already exists.'
 }
 
@@ -145,9 +160,9 @@ if((Get-AzureRmVirtualNetwork -Name $VNET2Name -ResourceGroupName $RGVNETName -E
 {
 	Write-Verbose -Message "Creating object: $VNET2Name of type VirtualNetwork with one subnet."
 	$SN1 = New-AzureRmVirtualNetworkSubnetConfig -Name 'SUBNET1' -AddressPrefix $VNET2Subnet1AddressRange
-    New-AzureRmVirtualNetwork -Name $VNET2Name -ResourceGroupName $RGVNETName -AddressPrefix $VNET2AddressSpace -Subnet $SN1 -Location $Location
-    # Grab created virtual network object for later:
-    $vnet2 = Get-AzureRmVirtualNetwork -Name $VNET2Name -ResourceGroupName $RGVNETName
+	New-AzureRmVirtualNetwork -Name $VNET2Name -ResourceGroupName $RGVNETName -AddressPrefix $VNET2AddressSpace -Subnet $SN1 -Location $Location
+	# Grab created virtual network object for later:
+	$vnet2 = Get-AzureRmVirtualNetwork -Name $VNET2Name -ResourceGroupName $RGVNETName
 }
 
 
@@ -162,10 +177,12 @@ $subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -VirtualNe
 ###########################################
 # 2. Create a public IP address:
 Write-Verbose -Message "Creating object: $VirtualNetworkGatewayName of type PublicIP. This can take a while."
-try {
+try 
+{
 	$Pip = New-AzureRMPublicIpAddress -Name $VirtualNetworkGatewayPIPName -ResourceGroupName $RGVNETName -Location $Location -AllocationMethod Dynamic -ErrorAction Stop	
 }
-catch {
+catch 
+{
 	throw $_
 }
 
@@ -176,11 +193,13 @@ $ngwipconfig = New-AzureRMVirtualNetworkGatewayIpConfig -Name ngwipconfig -Subne
 ###########################################
 # 4. Create the VNG:
 Write-Verbose -Message "Creating object: $VirtualNetworkGatewayName of type VirtualNetworkGateway. This can take a while."
-try {
+try
+{
 	New-AzureRmVirtualNetworkGateway -Name $VirtualNetworkGatewayName -ResourceGroupName $RGVNETName -Location $Location -IpConfigurations $ngwIpConfig -GatewayType 'Vpn' -VpnType 'RouteBased' -GatewaySku 'Basic' -ErrorAction Stop	
 }
-catch {
-	throw $_	
+catch 
+{
+	throw $_
 }
 
 
@@ -192,7 +211,9 @@ if((Get-AzureRmResourceGroup -Name $RGVMName -ErrorAction SilentlyContinue) -eq 
 {
     Write-Verbose -Message "Creating object: $RGVMName of type ResourceGroup"
     New-AzureRmResourceGroup -Name $RGVMName -Location $Location
-} else {
+}
+else 
+{
     Write-Verbose -Message "ResourceGroup $RGVMName already exists."
 }
 
@@ -204,53 +225,68 @@ $VM3Name = 'VM3'
 if((Get-AzureRmVM -Name $VM1Name -ResourceGroupName $RGVMName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) -eq $null)
 {
 	Write-Verbose -Message "Creating object: $VM1Name of type VirtualMachine"
-	try {
+	try
+	{
         New-AzureRmResourceGroupDeployment -ResourceGroupName $RGVMName -TemplateFile '.\VM1\template.json' -TemplateParameterFile '.\VM1\parameters.json' -adminPassword $AdminPassword -ErrorAction Stop
     }
-    catch {
+	catch
+	{
         $_
     }
-} else {
+}
+else
+{
 	$Error.Remove($Error[0])
-    Write-Verbose -Message "$VM1Name already exists."
+	Write-Verbose -Message "$VM1Name already exists."
 }
 
 if((Get-AzureRmVM -Name $VM2Name -ResourceGroupName $RGVMName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) -eq $null)
 {
 	Write-Verbose -Message "Creating object: $VM2Name of type VirtualMachine"
-	try {
+	try
+	{
         New-AzureRmResourceGroupDeployment -ResourceGroupName $RGVMName -TemplateFile '.\VM2\template.json' -TemplateParameterFile '.\VM2\parameters.json' -adminPassword $AdminPassword -ErrorAction Stop
     }
-    catch {
+	catch
+	{
 		$_
     }
-} else {
+}
+else
+{
 	$Error.Remove($Error[0])
-    Write-Verbose -Message "$VM2Name already exists."
+	Write-Verbose -Message "$VM2Name already exists."
 }
 
 if((Get-AzureRmVM -Name $VM3Name -ResourceGroupName $RGVMName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue) -eq $null)
 {
 	Write-Verbose -Message "Creating object: $VM3Name of type VirtualMachine"
-	try {
+	try
+	{
         New-AzureRmResourceGroupDeployment -ResourceGroupName $RGVMName -TemplateFile '.\VM3\template.json' -TemplateParameterFile '.\VM3\parameters.json' -adminPassword $AdminPassword -ErrorAction Stop
     }
-    catch {
+	catch
+	{
 		$_
     }
-} else {
-	$Error.Remove($Error[0])
-    Write-Verbose -Message "$VM3Name already exists."
 }
+else
+{
+	$Error.Remove($Error[0])
+	Write-Verbose -Message "$VM3Name already exists."
+}
+
 
 ##################################################################################
 ## Enable IP Forwarding on the Virtual Network Interface for VM1
-try {
+try
+{
     $nic = Get-AzureRmNetworkInterface -ResourceGroupName $RGVMName | Where-Object { ($_.VirtualMachine).Id -like "*$VM1Name" }
     $nic.EnableIPForwarding = 1
     $nic | Set-AzureRmNetworkInterface -ErrorAction Stop
 }
-catch {
+catch
+{
     Write-Verbose -Message "Could not set IP forwarding."
 }
 
@@ -262,7 +298,8 @@ catch {
 
 ##################################################################################
 # VNET peering
-try {
+try
+{
 	# Peer VNet1 to VNet2.
 	Write-Verbose -Message "Peering VNET1 to VNET2" 
 	Add-AzureRmVirtualNetworkPeering -VirtualNetwork $vnet1 -RemoteVirtualNetworkId $vnet2.Id -Name 'Vnet1ToVnet2' -ErrorAction Stop
@@ -270,7 +307,8 @@ try {
 	Write-Verbose -Message "Peering VNET2 to VNET1" 
 	Add-AzureRmVirtualNetworkPeering -VirtualNetwork $vnet2 -RemoteVirtualNetworkId $vnet1.Id -Name 'Vnet2ToVnet1' -ErrorAction Stop
 }
-catch {
+catch
+{
 	$_
 }
 
@@ -278,7 +316,8 @@ catch {
 
 ##################################################################################
 # Create a route table and define a route:
-try {
+try
+{
 	New-AzureRmRouteTable -Name $RouteTableName -ResourceGroupName $RGVNETName -location $Location -ErrorAction Stop
 	# Add a route to get to VNET1, Subnet 2.
 	Get-AzureRmRouteTable -ResourceGroupName $RGVNETName -Name $RouteTableName | Add-AzureRmRouteConfig -Name "To-VNET1-Subnet2" -AddressPrefix '192.168.2.0/24' -NextHopType 'VirtualAppliance' -NextHopIpAddress '192.168.1.4' | Set-AzureRmRouteTable -ErrorAction Stop
@@ -286,7 +325,8 @@ try {
 	$RouteTable = Get-AzureRmRouteTable -Name $RouteTableName -ResourceGroupName $RGVNETName
 	Set-AzureRmVirtualNetworkSubnetConfig -Name 'SUBNET1' -VirtualNetwork $vnet2 -AddressPrefix $VNET2Subnet1AddressRange -RouteTableId $RouteTable.Id | Set-AzureRmVirtualNetwork -ErrorAction Stop
 }
-catch {
+catch
+{
 	$_
 }
 
