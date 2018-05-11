@@ -176,7 +176,7 @@ $subnet = Get-AzureRmVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -VirtualNe
 
 ###########################################
 # 2. Create a public IP address:
-Write-Verbose -Message "Creating object: $VirtualNetworkGatewayName of type PublicIP. This can take a while."
+Write-Verbose -Message "Creating object: $VirtualNetworkGatewayName of type PublicIP."
 try 
 {
 	$Pip = New-AzureRMPublicIpAddress -Name $VirtualNetworkGatewayPIPName -ResourceGroupName $RGVNETName -Location $Location -AllocationMethod Dynamic -ErrorAction Stop	
@@ -201,7 +201,6 @@ catch
 {
 	throw $_
 }
-
 
 
 ##################################################################################
